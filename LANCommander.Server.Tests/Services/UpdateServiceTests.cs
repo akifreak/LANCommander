@@ -1,6 +1,6 @@
 using LANCommander.Server.Data.Models;
 using LANCommander.Server.Services;
-using LANCommander.Server.Services.Models;
+using LANCommander.Server.Settings.Enums;
 using LANCommander.Server.Tests.Mocks;
 using Moq;
 using Shouldly;

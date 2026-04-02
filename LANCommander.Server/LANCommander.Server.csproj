@@ -1,12 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
+    <!-- Exclude any published-* staging directories that may exist inside this
+         project folder from ALL SDK item globs (Content, None, Compile, and the
+         Blazor SDK's own *.razor.js filesystem scan that raises BLAZOR106). -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);published-*/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-LANCommander-C1F79CFA-9767-4AD7-BD5A-2549F8328A2D</UserSecretsId>
     <ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
     <TypeScriptModuleKind>none</TypeScriptModuleKind>
-	<Version>1.1.0</Version>
+	<Version>2.0.2-lukas-experimental</Version>
 	<Company>LANCommander</Company>
 	<Product>Server</Product>
   </PropertyGroup>
@@ -50,6 +57,7 @@
 
 	<Target Name="CompileGlobalSass" BeforeTargets="Compile">
 		<Message Text="Compiling global SCSS files" Importance="high" />
+		<Exec Command="npm install" />
 		<Exec Command="npm run package" />
 	</Target>
 

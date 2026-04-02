@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using LANCommander.SDK.Services;
 
 namespace LANCommander.Server.Tests.Client;
 
@@ -16,7 +18,8 @@ public class AuthenticationTests : IClassFixture<ApplicationFixture>
     [Fact]
     public async Task PingShouldWork()
     {
-        var response = await _fixture.Client.PingAsync();
+        var authClient = _fixture.ServiceProvider.GetRequiredService<AuthenticationClient>();
+        var response = await authClient.ValidateTokenAsync();
         
         response.ShouldBeTrue();
     }

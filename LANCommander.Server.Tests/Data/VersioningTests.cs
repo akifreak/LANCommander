@@ -13,12 +13,13 @@ public class VersioningTests(ApplicationFixture fixture) : BaseTest(fixture)
         // Simple service that's not bound to change much
         var tagService = GetService<TagService>();
         var authenticationClient = GetService<AuthenticationClient>();
+        var tagClient = GetService<TagClient>();
             
         var user = await EnsureAdminUserCreatedAsync();
         
-        await authenticationClient.AuthenticateAsync(TestConstants.AdminUserName, TestConstants.AdminInitialPassword);
+        await authenticationClient.AuthenticateAsync(TestConstants.AdminUserName, TestConstants.AdminInitialPassword, ApplicationFixture.Instance.Server.BaseAddress);
 
-        var response = await Client.Tags.CreateAsync(new SDK.Models.Tag
+        var response = await tagClient.CreateAsync(new SDK.Models.Tag
         {
             Name = "Test Tag",
         });

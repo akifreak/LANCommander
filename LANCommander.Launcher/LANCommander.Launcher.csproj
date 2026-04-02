@@ -89,6 +89,7 @@
 
 	<Target Name="CompileGlobalSass" BeforeTargets="Compile">
 		<Message Text="Compiling global SCSS files" Importance="high" />
+		<Exec Command="npm install" />
 		<Exec Command="npm run package" />
 	</Target>
 </Project>

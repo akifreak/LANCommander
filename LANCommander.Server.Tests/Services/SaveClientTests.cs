@@ -1,6 +1,7 @@
 using System.Text;
 using LANCommander.SDK;
 using LANCommander.SDK.Enums;
+using LANCommander.SDK.Services;
 using LANCommander.SDK.Helpers;
 using LANCommander.SDK.Utilities;
 using LANCommander.Server.Data.Models;
@@ -24,19 +25,19 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
         {
             File.WriteAllText("test.txt", "Hello World!");
 
-            using (var archive = ZipArchive.Create())
+            using (var archive = ZipArchive.CreateArchive())
             {
                 archive.AddEntry("test.txt", "test.txt");
 
                 archive.SaveTo("test.zip", CompressionType.None);
-                
+
                 var fileInfo = new FileInfo("test.zip");
-                
+
                 fileInfo.Length.ShouldBe(126);
             }
 
             using (Stream stream = File.OpenRead("test.zip"))
-            using (var reader = ReaderFactory.Open(stream))
+            using (var reader = ReaderFactory.OpenReader(stream, new ReaderOptions()))
             {
                 while (reader.MoveToNextEntry())
                 {
@@ -63,7 +64,7 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
             File.WriteAllText("test.txt", "Hello World!");
 
             using (var ms = new MemoryStream())
-            using (var archive = ZipArchive.Create())
+            using (var archive = ZipArchive.CreateArchive())
             {
                 archive.AddEntry("test.txt", "test.txt");
 
@@ -73,7 +74,7 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
 
                 ms.Length.ShouldBe(126);
 
-                using (var reader = ReaderFactory.Open(ms))
+                using (var reader = ReaderFactory.OpenReader(ms, new ReaderOptions()))
                 {
                     while (reader.MoveToNextEntry())
                     {
@@ -104,7 +105,8 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
         
         var user = await EnsureAdminUserCreatedAsync();
         
-        await Client.AuthenticateAsync(TestConstants.AdminUserName, TestConstants.AdminInitialPassword);
+        var authClient = GetService<AuthenticationClient>();
+        await authClient.AuthenticateAsync(TestConstants.AdminUserName, TestConstants.AdminInitialPassword, ApplicationFixture.Instance.Server.BaseAddress);
         
         var installDirectory = GetTemporaryDirectory();
         var tempPath = await EnsureStorageLocationsExistAsync();
@@ -128,10 +130,11 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
             game = await gameService.AddAsync(game);
 
             // Mock game install directory
+            var gameClient = GetService<GameClient>();
             var sdkGame = await gameClient.GetAsync(game.Id);
 
             var gameInstallDirectory = await gameClient.GetInstallDirectory(sdkGame, installDirectory);
-            var manifest = gameClient.GetManifest(game.Id);
+            var manifest = await gameClient.GetManifestAsync(game.Id);
 
             Directory.CreateDirectory(Path.Combine(gameInstallDirectory, ".lancommander"));
             Directory.CreateDirectory(Path.Combine(gameInstallDirectory, "save"));
@@ -160,7 +163,7 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
 
                 var stream = await savePacker.PackAsync();
 
-                using (var reader = ReaderFactory.Open(stream, new ReaderOptions()
+                using (var reader = ReaderFactory.OpenReader(stream, new ReaderOptions()
                        {
                            LeaveStreamOpen = true,
                        }))
@@ -184,7 +187,7 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
 
                 packedSize = stream.Length;
 
-                uploadedSave = await Client.Saves.UploadAsync(stream, manifest);
+                uploadedSave = await GetService<SaveClient>().UploadAsync(stream, manifest);
             }
 
             #endregion
@@ -209,7 +212,7 @@ public class SaveClientTests(ApplicationFixture fixture) : BaseTest(fixture)
 
             // Check contents of file
             using (var fs = File.OpenRead(uploadedSavePath))
-            using (var reader = ReaderFactory.Open(fs, new ReaderOptions()
+            using (var reader = ReaderFactory.OpenReader(fs, new ReaderOptions()
                    {
                        LeaveStreamOpen = true,
                    }))

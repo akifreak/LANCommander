@@ -244,17 +244,8 @@ public class ImporterTests(ApplicationFixture fixture) : BaseTest(fixture)
             }
         };
 
-        // Set the manifest on the import context
-
-        // Prepare the import queue with all flags
-        var importFlags = ImportRecordFlags.Actions | ImportRecordFlags.Archives | ImportRecordFlags.Collections |
-                         ImportRecordFlags.CustomFields | ImportRecordFlags.Developers | ImportRecordFlags.Engine |
-                         ImportRecordFlags.Genres | ImportRecordFlags.Keys | ImportRecordFlags.Media |
-                         ImportRecordFlags.MultiplayerModes | ImportRecordFlags.Platforms | ImportRecordFlags.PlaySessions |
-                         ImportRecordFlags.Publishers | ImportRecordFlags.Saves | ImportRecordFlags.SavePaths |
-                         ImportRecordFlags.Scripts | ImportRecordFlags.Tags;
-
-        await importContext.PrepareGameImportQueueAsync(manifest, importFlags);
+        // Import the game using the correct API
+        await importContext.AddAsync(manifest);
 
         // Import the queue
         await importContext.ImportQueueAsync();
