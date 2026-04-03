@@ -100,6 +100,7 @@
             var artifacts = await UpdateService.GetLauncherArtifactsAsync();
 
             DownloadLinks = artifacts
+                .Where(a => !a.Url.ToLower().EndsWith(".exe"))
                 .OrderBy(a => a.Platform)
                 .ThenBy(a => a.Architecture)
                 .Select(a =>
