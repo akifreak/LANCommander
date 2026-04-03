@@ -67,7 +67,7 @@ namespace LANCommander.Server.Services
             if (releaseChannel != _settingsProvider.CurrentValue.Server.Update.ReleaseChannel)
                 releaseChannel = _settingsProvider.CurrentValue.Server.Update.ReleaseChannel;
             
-            var tag = $"v{currentVersion.WithoutMetadata()}";
+            var tag = $"v{currentVersion.Major}.{currentVersion.Minor}.{currentVersion.Patch}";
 
             if (releaseChannel == ReleaseChannel.Nightly)
                 tag = "nightly";
