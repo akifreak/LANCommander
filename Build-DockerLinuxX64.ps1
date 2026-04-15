@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$Version = "2.0.2-lukas-experimental"
+$Version = "2.0.2-ZucherPing"
 
 # 1. Build the frontend
 npm install --prefix ./LANCommander.UI
